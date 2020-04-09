@@ -336,6 +336,7 @@ impl<'a> From<&'a str> for DirOrderFlag {
 pub enum ColorTheme {
     Dark,
     Light,
+    Minimal,
 }
 
 impl<'a> From<&'a str> for ColorTheme {
@@ -343,6 +344,7 @@ impl<'a> From<&'a str> for ColorTheme {
         match theme {
             "dark" => ColorTheme::Dark,
             "light" => ColorTheme::Light,
+            "minimal" => ColorTheme::Minimal,
             _ => panic!("invalid \"color-theme\" flag: {}", theme),
         }
     }

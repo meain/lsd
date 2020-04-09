@@ -37,6 +37,7 @@ pub fn build() -> App<'static, 'static> {
                 .long("color-theme")
                 .possible_value("dark")
                 .possible_value("light")
+                .possible_value("minimal")
                 .default_value("dark")
                 .multiple(true)
                 .number_of_values(1)

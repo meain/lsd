@@ -67,6 +67,7 @@ pub enum Theme {
     NoColor,
     Default,
     Light,
+    Minimal,
     NoLscolors,
 }
 
@@ -81,12 +82,14 @@ impl Colors {
             Theme::NoColor => None,
             Theme::Default => Some(Self::get_dark_theme_colour_map()),
             Theme::Light => Some(Self::get_light_theme_colour_map()),
+            Theme::Minimal => Some(Self::get_minimal_theme_colour_map()),
             Theme::NoLscolors => Some(Self::get_dark_theme_colour_map()),
         };
         let lscolors = match theme {
             Theme::NoColor => None,
             Theme::Default => Some(LsColors::from_env().unwrap_or_default()),
             Theme::Light => Some(LsColors::from_env().unwrap_or_default()),
+            Theme::Minimal => Some(LsColors::from_env().unwrap_or_default()),
             Theme::NoLscolors => None,
         };
 
@@ -318,6 +321,76 @@ impl Colors {
 
         // INode
         m.insert(Elem::INode { valid: true }, Colour::Fixed(13)); // Pink
+        m.insert(Elem::INode { valid: false }, Colour::Fixed(245)); // Grey
+
+        m
+    }
+
+    fn get_minimal_theme_colour_map() -> HashMap<Elem, Colour> {
+        let mut m = HashMap::new();
+        // User / Group
+        m.insert(Elem::User, Colour::Black);
+        m.insert(Elem::Group, Colour::Black);
+
+        // Permissions
+        m.insert(Elem::Read, Colour::Black);
+        m.insert(Elem::Write, Colour::Black);
+        m.insert(Elem::Exec, Colour::Black);
+        m.insert(Elem::ExecSticky, Colour::Black);
+        m.insert(Elem::NoAccess, Colour::Fixed(245)); // Grey
+
+        // File Types
+        m.insert(
+            Elem::File {
+                exec: false,
+                uid: false,
+            },
+            Colour::Fixed(184),
+        ); // Yellow3
+        m.insert(
+            Elem::File {
+                exec: false,
+                uid: true,
+            },
+            Colour::Fixed(184),
+        ); // Yellow3
+        m.insert(
+            Elem::File {
+                exec: true,
+                uid: false,
+            },
+            Colour::Fixed(40),
+        ); // Green3
+        m.insert(
+            Elem::File {
+                exec: true,
+                uid: true,
+            },
+            Colour::Fixed(40),
+        ); // Green3
+        m.insert(Elem::Dir { uid: true }, Colour::Fixed(33)); // DodgerBlue1
+        m.insert(Elem::Dir { uid: false }, Colour::Fixed(33)); // DodgerBlue1
+        m.insert(Elem::Pipe, Colour::Fixed(44)); // DarkTurquoise
+        m.insert(Elem::SymLink, Colour::Fixed(44)); // DarkTurquoise
+        m.insert(Elem::BrokenSymLink, Colour::Fixed(124)); // Red3
+        m.insert(Elem::BlockDevice, Colour::Fixed(44)); // DarkTurquoise
+        m.insert(Elem::CharDevice, Colour::Fixed(172)); // Orange3
+        m.insert(Elem::Socket, Colour::Fixed(44)); // DarkTurquoise
+        m.insert(Elem::Special, Colour::Fixed(44)); // DarkTurquoise
+
+        // Last Time Modified
+        m.insert(Elem::HourOld, Colour::Black);
+        m.insert(Elem::DayOld, Colour::Black);
+        m.insert(Elem::Older, Colour::Fixed(245));
+
+        // Last Time Modified
+        m.insert(Elem::NonFile, Colour::Fixed(245)); // Grey
+        m.insert(Elem::FileSmall, Colour::Black);
+        m.insert(Elem::FileMedium, Colour::Black);
+        m.insert(Elem::FileLarge, Colour::Black);
+
+        // INode
+        m.insert(Elem::INode { valid: true }, Colour::Black);
         m.insert(Elem::INode { valid: false }, Colour::Fixed(245)); // Grey
 
         m

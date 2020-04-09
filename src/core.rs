@@ -47,6 +47,7 @@ impl Core {
             (_, WhenFlag::Never, _) | (false, WhenFlag::Auto, _) => color::Theme::NoColor,
             (_, _, ColorTheme::Dark) => color::Theme::Default,
             (_, _, ColorTheme::Light) => color::Theme::Light,
+            (_, _, ColorTheme::Minimal) => color::Theme::Minimal,
         };
 
         let icon_theme = match (tty_available, flags.icon, flags.icon_theme) {
