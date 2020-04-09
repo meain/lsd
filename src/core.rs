@@ -1,6 +1,6 @@
 use crate::color::{self, Colors};
 use crate::display;
-use crate::flags::{Display, Flags, IconTheme, Layout, WhenFlag};
+use crate::flags::{ColorTheme, Display, Flags, IconTheme, Layout, WhenFlag};
 use crate::icon::{self, Icons};
 use crate::meta::Meta;
 use crate::{print_error, print_output, sort};
@@ -39,9 +39,14 @@ impl Core {
 
         let mut inner_flags = flags.clone();
 
-        let color_theme = match (tty_available && console_color_ok, flags.color) {
-            (_, WhenFlag::Never) | (false, WhenFlag::Auto) => color::Theme::NoColor,
-            _ => color::Theme::Default,
+        let color_theme = match (
+            tty_available && console_color_ok,
+            flags.color,
+            flags.color_theme,
+        ) {
+            (_, WhenFlag::Never, _) | (false, WhenFlag::Auto, _) => color::Theme::NoColor,
+            (_, _, ColorTheme::Dark) => color::Theme::Default,
+            (_, _, ColorTheme::Light) => color::Theme::Light,
         };
 
         let icon_theme = match (tty_available, flags.icon, flags.icon_theme) {

@@ -14,6 +14,7 @@ pub struct Flags {
     pub size: SizeFlag,
     pub date: DateFlag,
     pub color: WhenFlag,
+    pub color_theme: ColorTheme,
     pub icon: WhenFlag,
     pub icon_theme: IconTheme,
     pub inode: bool,
@@ -30,6 +31,7 @@ impl Flags {
         let color_inputs: Vec<&str> = matches.values_of("color").unwrap().collect();
         let icon_inputs: Vec<&str> = matches.values_of("icon").unwrap().collect();
         let icon_theme_inputs: Vec<&str> = matches.values_of("icon-theme").unwrap().collect();
+        let color_theme_inputs: Vec<&str> = matches.values_of("color-theme").unwrap().collect();
         let size_inputs: Vec<&str> = matches.values_of("size").unwrap().collect();
         let date_inputs: Vec<&str> = matches.values_of("date").unwrap().collect();
         let dir_order_inputs: Vec<&str> = matches.values_of("group-dirs").unwrap().collect();
@@ -165,6 +167,7 @@ impl Flags {
             } else {
                 WhenFlag::from(color_inputs[color_inputs.len() - 1])
             },
+            color_theme: ColorTheme::from(color_theme_inputs[color_theme_inputs.len() - 1]),
             icon: if classic_mode {
                 WhenFlag::Never
             } else {
@@ -197,6 +200,7 @@ impl Default for Flags {
             size: SizeFlag::Default,
             date: DateFlag::Date,
             color: WhenFlag::Auto,
+            color_theme: ColorTheme::Dark,
             icon: WhenFlag::Auto,
             icon_theme: IconTheme::Fancy,
             blocks: vec![],
@@ -324,6 +328,22 @@ impl<'a> From<&'a str> for DirOrderFlag {
             "first" => DirOrderFlag::First,
             "last" => DirOrderFlag::Last,
             _ => panic!("invalid \"when\" flag: {}", when),
+        }
+    }
+}
+
+#[derive(Clone, Debug, Copy, PartialEq, Eq)]
+pub enum ColorTheme {
+    Dark,
+    Light,
+}
+
+impl<'a> From<&'a str> for ColorTheme {
+    fn from(theme: &'a str) -> Self {
+        match theme {
+            "dark" => ColorTheme::Dark,
+            "light" => ColorTheme::Light,
+            _ => panic!("invalid \"color-theme\" flag: {}", theme),
         }
     }
 }
