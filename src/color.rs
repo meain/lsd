@@ -312,9 +312,9 @@ impl Colors {
 
         // Last Time Modified
         m.insert(Elem::NonFile, Colour::Fixed(245)); // Grey
-        m.insert(Elem::FileSmall, Colour::Fixed(216)); // Wheat1
-        m.insert(Elem::FileMedium, Colour::Fixed(215)); // LightSalmon1
-        m.insert(Elem::FileLarge, Colour::Fixed(214)); // Orange3
+        m.insert(Elem::FileSmall, Colour::Fixed(180));
+        m.insert(Elem::FileMedium, Colour::Fixed(137)); // LightSalmon1
+        m.insert(Elem::FileLarge, Colour::Fixed(130)); // Orange3
 
         // INode
         m.insert(Elem::INode { valid: true }, Colour::Fixed(13)); // Pink
