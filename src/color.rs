@@ -89,7 +89,7 @@ impl Colors {
             Theme::NoColor => None,
             Theme::Default => Some(LsColors::from_env().unwrap_or_default()),
             Theme::Light => Some(LsColors::from_env().unwrap_or_default()),
-            Theme::Minimal => LsColors::from_env(),
+            Theme::Minimal => Some(LsColors::from_env().unwrap_or_default()),
             Theme::NoLscolors => None,
         };
 
