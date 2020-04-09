@@ -89,7 +89,7 @@ impl Colors {
             Theme::NoColor => None,
             Theme::Default => Some(LsColors::from_env().unwrap_or_default()),
             Theme::Light => Some(LsColors::from_env().unwrap_or_default()),
-            Theme::Minimal => Some(LsColors::from_env().unwrap_or_default()),
+            Theme::Minimal => LsColors::from_env(),
             Theme::NoLscolors => None,
         };
 
@@ -337,7 +337,7 @@ impl Colors {
         m.insert(Elem::Write, Colour::Black);
         m.insert(Elem::Exec, Colour::Black);
         m.insert(Elem::ExecSticky, Colour::Black);
-        m.insert(Elem::NoAccess, Colour::Fixed(245)); // Grey
+        m.insert(Elem::NoAccess, Colour::Fixed(250)); // Grey
 
         // File Types
         m.insert(
@@ -345,33 +345,33 @@ impl Colors {
                 exec: false,
                 uid: false,
             },
-            Colour::Fixed(184),
-        ); // Yellow3
+            Colour::Black,
+        );
         m.insert(
             Elem::File {
                 exec: false,
                 uid: true,
             },
             Colour::Fixed(184),
-        ); // Yellow3
+        );
         m.insert(
             Elem::File {
                 exec: true,
                 uid: false,
             },
-            Colour::Fixed(40),
-        ); // Green3
+            Colour::Fixed(208),
+        );
         m.insert(
             Elem::File {
                 exec: true,
                 uid: true,
             },
-            Colour::Fixed(40),
-        ); // Green3
-        m.insert(Elem::Dir { uid: true }, Colour::Fixed(33)); // DodgerBlue1
-        m.insert(Elem::Dir { uid: false }, Colour::Fixed(33)); // DodgerBlue1
+            Colour::Fixed(208),
+        );
+        m.insert(Elem::Dir { uid: true }, Colour::Fixed(3)); // DodgerBlue1
+        m.insert(Elem::Dir { uid: false }, Colour::Fixed(26)); // DodgerBlue1
         m.insert(Elem::Pipe, Colour::Fixed(44)); // DarkTurquoise
-        m.insert(Elem::SymLink, Colour::Fixed(44)); // DarkTurquoise
+        m.insert(Elem::SymLink, Colour::Fixed(37));
         m.insert(Elem::BrokenSymLink, Colour::Fixed(124)); // Red3
         m.insert(Elem::BlockDevice, Colour::Fixed(44)); // DarkTurquoise
         m.insert(Elem::CharDevice, Colour::Fixed(172)); // Orange3
@@ -384,8 +384,8 @@ impl Colors {
         m.insert(Elem::Older, Colour::Fixed(245));
 
         // Last Time Modified
-        m.insert(Elem::NonFile, Colour::Fixed(245)); // Grey
-        m.insert(Elem::FileSmall, Colour::Black);
+        m.insert(Elem::NonFile, Colour::Fixed(250)); // Grey
+        m.insert(Elem::FileSmall, Colour::Fixed(245));
         m.insert(Elem::FileMedium, Colour::Black);
         m.insert(Elem::FileLarge, Colour::Black);
 
