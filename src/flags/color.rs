@@ -13,6 +13,7 @@ use yaml_rust::Yaml;
 pub struct Color {
     /// When to use color.
     pub when: ColorOption,
+    pub theme: ColorTheme,
 }
 
 impl Color {
@@ -21,7 +22,8 @@ impl Color {
     /// The [ColorOption] is configured with their respective [Configurable] implementation.
     pub fn configure_from(matches: &ArgMatches, config: &Config) -> Self {
         let when = ColorOption::configure_from(matches, config);
-        Self { when }
+        let theme = ColorTheme::configure_from(matches, config);
+        Self { when, theme }
     }
 }
 
@@ -101,6 +103,76 @@ impl Configurable<Self> for ColorOption {
 impl Default for ColorOption {
     fn default() -> Self {
         Self::Auto
+    }
+}
+
+/// The flag showing when to use colors in the output.
+#[derive(Clone, Debug, Copy, PartialEq, Eq)]
+pub enum ColorTheme {
+    Light,
+    Dark,
+    Minimal,
+}
+
+impl ColorTheme {
+    /// Get a Color value from a [Yaml] string. The [Config] is used to log warnings about wrong
+    /// values in a Yaml.
+    fn from_yaml_string(value: &str, config: &Config) -> Option<Self> {
+        match value {
+            "light" => Some(Self::Light),
+            "dark" => Some(Self::Dark),
+            "minimal" => Some(Self::Minimal),
+            _ => {
+                config.print_invalid_value_warning("color->theme", &value);
+                None
+            }
+        }
+    }
+}
+
+impl Configurable<Self> for ColorTheme {
+    /// Get a potential `ColorTheme` variant from [ArgMatches].
+    ///
+    /// If the argument is passed, this returns the variant corresponding to
+    /// its parameter in a [Some]. Otherwise this returns [None].
+    fn from_arg_matches(matches: &ArgMatches) -> Option<Self> {
+        if matches.occurrences_of("color-theme") > 0 {
+            match matches.value_of("color-theme") {
+                Some("light") => Some(Self::Light),
+                Some("dark") => Some(Self::Dark),
+                Some("minimal") => Some(Self::Minimal),
+                _ => Some(Self::Dark)
+            }
+        } else {
+            None
+        }
+    }
+
+    /// Get a potential `ColorTheme` variant from a [Config].
+    ///
+    /// If the Yaml contains a [String](Yaml::String) value pointed to by "color" ->
+    /// "theme" and it is one of "light", "dark" or "minimal", this returns its corresponding variant
+    /// in a [Some]. Otherwise this returns [None].
+    fn from_config(config: &Config) -> Option<Self> {
+        if let Some(yaml) = &config.yaml {
+            match &yaml["color"]["theme"] {
+                Yaml::BadValue => None,
+                Yaml::String(value) => Self::from_yaml_string(&value, &config),
+                _ => {
+                    config.print_wrong_type_warning("color->theme", "string");
+                    None
+                }
+            }
+        } else {
+            None
+        }
+    }
+}
+
+/// The default value for `ColorOption` is [ColorOption::Auto].
+impl Default for ColorTheme {
+    fn default() -> Self {
+        Self::Dark
     }
 }
 

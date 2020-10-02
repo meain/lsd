@@ -40,9 +40,9 @@ impl Core {
 
         let mut inner_flags = flags.clone();
 
-        let color_theme = match (tty_available && console_color_ok, flags.color.when) {
-            (_, ColorOption::Never) | (false, ColorOption::Auto) => color::Theme::NoColor,
-            _ => color::Theme::Default,
+        let color_mode = match (tty_available && console_color_ok, flags.color.when) {
+            (_, ColorOption::Never) | (false, ColorOption::Auto) => color::ColorMode::NoColor,
+            _ => color::ColorMode::Default,
         };
 
         let icon_theme = match (tty_available, flags.icons.when, flags.icons.theme) {
@@ -61,10 +61,11 @@ impl Core {
 
         let sorters = sort::assemble_sorters(&flags);
 
+        let color_theme = flags.color.theme;
         Self {
             flags,
             //display: Display::new(inner_flags),
-            colors: Colors::new(color_theme),
+            colors: Colors::new(color_mode, color_theme),
             icons: Icons::new(icon_theme),
             sorters,
         }

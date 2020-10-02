@@ -33,6 +33,17 @@ pub fn build() -> App<'static, 'static> {
                 .help("When to use terminal colours"),
         )
         .arg(
+            Arg::with_name("color-theme")
+                .long("color-theme")
+                .possible_value("light")
+                .possible_value("dark")
+                .possible_value("minimal")
+                .default_value("dark")
+                .multiple(true)
+                .number_of_values(1)
+                .help("Choose color theme for output"),
+        )
+        .arg(
             Arg::with_name("icon")
                 .long("icon")
                 .possible_value("always")
