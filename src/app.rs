@@ -259,6 +259,12 @@ pub fn build() -> App<'static, 'static> {
                 .help("Do not display files/directories with names matching the glob pattern(s). More than one can be specified by repeating the argument"),
         )
         .arg(
+            Arg::with_name("ignore-vcs")
+                .long("ignore-vcs")
+                .multiple(true)
+                .help("Ignore vcs ignored files/directories"),
+        )
+        .arg(
             Arg::with_name("inode")
                 .short("i")
                 .long("inode")

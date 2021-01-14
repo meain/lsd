@@ -14,12 +14,14 @@ use std::os::unix::io::AsRawFd;
 #[cfg(target_os = "windows")]
 use terminal_size::terminal_size;
 
+use ignore::gitignore::Gitignore;
+
 pub struct Core {
     flags: Flags,
     icons: Icons,
-    //display: Display,
     colors: Colors,
     sorters: Vec<(SortOrder, sort::SortFn)>,
+    vcs_ignore: Option<Gitignore>,
 }
 
 impl Core {
@@ -63,12 +65,22 @@ impl Core {
 
         let sorters = sort::assemble_sorters(&flags);
 
+        let mut ignorer = None;
+        if flags.ignore_vcs.0 {
+            // TODO: Need a way to figure out the gitignore file (project root)
+            let (iignorer, err) = Gitignore::new(".gitignore");
+            println!("err: {:?}", err);
+            println!("iignorer: {:?}", iignorer);
+            println!("iignorer-path: {:?}", iignorer.path());
+            ignorer = Some(iignorer);
+        }
+
         Self {
             flags,
-            //display: Display::new(inner_flags),
             colors: Colors::new(color_theme),
             icons: Icons::new(icon_theme, icon_separator),
             sorters,
+            vcs_ignore: ignorer,
         }
     }
 
@@ -99,7 +111,7 @@ impl Core {
             let recurse =
                 self.flags.layout == Layout::Tree || self.flags.display != Display::DirectoryOnly;
             if recurse {
-                match meta.recurse_into(depth, &self.flags) {
+                match meta.recurse_into(depth, &self.flags, self.vcs_ignore.as_ref()) {
                     Ok(content) => {
                         meta.content = content;
                         meta_list.push(meta);

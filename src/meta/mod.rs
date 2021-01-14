@@ -52,6 +52,7 @@ impl Meta {
         &self,
         depth: usize,
         flags: &Flags,
+        vcs_ignore: Option<&ignore::gitignore::Gitignore>,
     ) -> Result<Option<Vec<Meta>>, std::io::Error> {
         if depth == 0 {
             return Ok(None);
@@ -99,6 +100,26 @@ impl Meta {
             let entry = entry?;
             let path = entry.path();
 
+            if let Some(ig) = vcs_ignore {
+                if matches!(ig.matched(&path, path.is_dir()), ignore::Match::Ignore(_)) {
+                    continue;
+                }
+            }
+
+            // if filter(path) {
+            //     continue;
+            // }
+
+            // let ignore_status = ignorer.matched(&path, path.is_dir());
+            // println!("{:?} {}", ignore_status, &path.to_string_lossy());
+            // if matches!(
+            //     filter.matched(&path, path.is_dir()),
+            //     ignore::Match::Ignore(_)
+            // ) {
+            //     println!("Ignoring {}", &path.to_string_lossy());
+            //     continue;
+            // }
+
             let name = path
                 .file_name()
                 .ok_or_else(|| Error::new(ErrorKind::InvalidInput, "invalid file name"))?;
@@ -130,7 +151,7 @@ impl Meta {
                 }
             }
 
-            match entry_meta.recurse_into(depth - 1, &flags) {
+            match entry_meta.recurse_into(depth - 1, &flags, vcs_ignore) {
                 Ok(content) => entry_meta.content = content,
                 Err(err) => {
                     print_error!("{}: {}.", path.display(), err);

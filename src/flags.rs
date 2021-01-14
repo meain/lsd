@@ -5,6 +5,7 @@ pub mod dereference;
 pub mod display;
 pub mod icons;
 pub mod ignore_globs;
+pub mod ignore_vcs;
 pub mod indicators;
 pub mod layout;
 pub mod recursion;
@@ -26,6 +27,7 @@ pub use icons::IconSeparator;
 pub use icons::IconTheme;
 pub use icons::Icons;
 pub use ignore_globs::IgnoreGlobs;
+pub use ignore_vcs::IgnoreVCS;
 pub use indicators::Indicators;
 pub use layout::Layout;
 pub use recursion::Recursion;
@@ -56,6 +58,7 @@ pub struct Flags {
     pub display_indicators: Indicators,
     pub icons: Icons,
     pub ignore_globs: IgnoreGlobs,
+    pub ignore_vcs: IgnoreVCS,
     pub layout: Layout,
     pub no_symlink: NoSymlink,
     pub recursion: Recursion,
@@ -84,6 +87,7 @@ impl Flags {
             display_indicators: Indicators::configure_from(matches, config),
             icons: Icons::configure_from(matches, config),
             ignore_globs: IgnoreGlobs::configure_from(matches, config)?,
+            ignore_vcs: IgnoreVCS::configure_from(matches, config),
             no_symlink: NoSymlink::configure_from(matches, config),
             recursion: Recursion::configure_from(matches, config)?,
             sorting: Sorting::configure_from(matches, config),
