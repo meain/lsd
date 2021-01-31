@@ -43,6 +43,7 @@ impl<'a> From<&'a Metadata> for Owner {
     }
 }
 
+#[cfg(unix)]
 impl Owner {
     pub fn render_user(&self, colors: &Colors) -> ColoredString {
         colors.colorize(self.user.clone(), &Elem::User)
@@ -50,5 +51,18 @@ impl Owner {
 
     pub fn render_group(&self, colors: &Colors) -> ColoredString {
         colors.colorize(self.group.clone(), &Elem::Group)
+    }
+}
+
+#[cfg(windows)]
+impl Owner {
+    pub fn render_user(&self, colors: &Colors) -> ColoredString {
+        let user = if let Some(u) = self.user { u } else { "-" };
+        colors.colorize(u.clone(), &Elem::User)
+    }
+
+    pub fn render_group(&self, colors: &Colors) -> ColoredString {
+        let group = if let Some(u) = self.group { u } else { "-" };
+        colors.colorize(g.clone(), &Elem::Group)
     }
 }
