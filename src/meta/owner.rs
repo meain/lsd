@@ -2,10 +2,18 @@ use crate::color::{ColoredString, Colors, Elem};
 #[cfg(unix)]
 use std::fs::Metadata;
 
+#[cfg(unix)]
 #[derive(Clone, Debug)]
 pub struct Owner {
     user: String,
     group: String,
+}
+
+#[cfg(windows)]
+#[derive(Clone, Debug)]
+pub struct Owner {
+    user: Option<String>,
+    group: Option<String>,
 }
 
 impl Owner {
