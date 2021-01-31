@@ -16,10 +16,13 @@ pub struct Owner {
     group: Option<String>,
 }
 
+#[cfg(windows)]
 impl Owner {
-    #[cfg_attr(unix, allow(dead_code))]
     pub fn new(user: String, group: String) -> Self {
-        Self { user, group }
+        Self {
+            user: Some(user),
+            group: Some(group),
+        }
     }
 }
 
