@@ -60,12 +60,12 @@ impl Owner {
 #[cfg(windows)]
 impl Owner {
     pub fn render_user(&self, colors: &Colors) -> ColoredString {
-        let user = if let Some(u) = self.user { u } else { "-".to_string() };
+        let user = if let Some(u) = &self.user { u } else { "-".to_string() };
         colors.colorize(user.clone(), &Elem::User)
     }
 
     pub fn render_group(&self, colors: &Colors) -> ColoredString {
-        let group = if let Some(u) = self.group { u } else { "-".to_string() };
+        let group = if let Some(u) = &self.group { u } else { "-".to_string() };
         colors.colorize(group.clone(), &Elem::Group)
     }
 }
