@@ -14,14 +14,13 @@ use std::os::unix::io::AsRawFd;
 #[cfg(target_os = "windows")]
 use terminal_size::terminal_size;
 
-use ignore::gitignore::Gitignore;
+use ignore::gitignore::GitignoreBuilder;
 
 pub struct Core {
     flags: Flags,
     icons: Icons,
     colors: Colors,
     sorters: Vec<(SortOrder, sort::SortFn)>,
-    vcs_ignore: Option<Gitignore>,
 }
 
 impl Core {
@@ -65,22 +64,11 @@ impl Core {
 
         let sorters = sort::assemble_sorters(&flags);
 
-        let mut ignorer = None;
-        if flags.ignore_vcs.0 {
-            // TODO: Need a way to figure out the gitignore file (project root)
-            let (iignorer, err) = Gitignore::new(".gitignore");
-            println!("err: {:?}", err);
-            println!("iignorer: {:?}", iignorer);
-            println!("iignorer-path: {:?}", iignorer.path());
-            ignorer = Some(iignorer);
-        }
-
         Self {
             flags,
             colors: Colors::new(color_theme),
             icons: Icons::new(icon_theme, icon_separator),
             sorters,
-            vcs_ignore: ignorer,
         }
     }
 
@@ -100,6 +88,34 @@ impl Core {
         };
 
         for path in paths {
+            let mut vcs_ignore: Option<GitignoreBuilder> = None;
+            if self.flags.ignore_vcs.0 {
+                let full_path = path.canonicalize();
+                // println!("full_path: {:?}", full_path);
+                if let Ok(sp) = full_path {
+                    for entry in sp.ancestors() {
+                        println!("entry: {:?}", entry);
+                        if entry.join(".git").is_dir() {
+                            vcs_ignore = Some(GitignoreBuilder::new(&entry));
+                            if let Some(ref mut vi) = vcs_ignore {
+                                // TODO: add all gitignores under the root git dir as well
+                                // - loop reverse collecting all gitignore files
+                                // - once we find .git dir, apply all the gitignore files
+                                if entry.join(".gitignore").is_file() {
+                                    println!("Adding {:?}", entry.join(".gitignore"));
+                                    vi.add(entry.join(".gitignore"));
+                                }
+                            }
+                            break;
+                        }
+                    }
+                }
+                // for entry in full_path?.ancestors() {
+                //     println!("entry: {:?}", entry);
+                // }
+                // Some(GitignoreBuilder::new(&path));
+            }
+            // TODO: add all parent .gitignores
             let mut meta = match Meta::from_path(&path, self.flags.dereference.0) {
                 Ok(meta) => meta,
                 Err(err) => {
@@ -111,7 +127,7 @@ impl Core {
             let recurse =
                 self.flags.layout == Layout::Tree || self.flags.display != Display::DirectoryOnly;
             if recurse {
-                match meta.recurse_into(depth, &self.flags, self.vcs_ignore.as_ref()) {
+                match meta.recurse_into(depth, &self.flags, &mut vcs_ignore) {
                     Ok(content) => {
                         meta.content = content;
                         meta_list.push(meta);

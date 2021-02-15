@@ -31,6 +31,8 @@ use std::fs::read_link;
 use std::io::{Error, ErrorKind};
 use std::path::{Component, Path, PathBuf};
 
+use ignore::gitignore::Gitignore;
+
 #[derive(Clone, Debug)]
 pub struct Meta {
     pub name: Name,
@@ -52,7 +54,7 @@ impl Meta {
         &self,
         depth: usize,
         flags: &Flags,
-        vcs_ignore: Option<&ignore::gitignore::Gitignore>,
+        vcs_ignore: &mut Option<ignore::gitignore::GitignoreBuilder>,
     ) -> Result<Option<Vec<Meta>>, std::io::Error> {
         if depth == 0 {
             return Ok(None);
@@ -96,29 +98,33 @@ impl Meta {
             content.push(parent_meta);
         }
 
+        let mut vcs_ignore_instance: Option<Gitignore> = None;
+        if flags.ignore_vcs.0 {
+            if let Some(mut vi) = vcs_ignore.clone() {
+                // build gitignore for this dir level
+                if self.path.join(".gitignore").exists() {
+                    println!("Adding {:?}", self.path.join(".gitignore").canonicalize()?);
+                    let e = vi.add(self.path.join(".gitignore").canonicalize()?);
+                    println!("e: {:?}", e);
+                    // TODO: handle issue with nested gitignore not respecting absolute paths
+                }
+                vcs_ignore_instance = vi.clone().build().ok();
+            }
+        }
+
         for entry in entries {
             let entry = entry?;
             let path = entry.path();
 
-            if let Some(ig) = vcs_ignore {
-                if matches!(ig.matched(&path, path.is_dir()), ignore::Match::Ignore(_)) {
+            if let Some(ig) = &vcs_ignore_instance {
+                println!("path: {:?}", path);
+                if matches!(
+                    ig.matched(&path.canonicalize()?, path.is_dir()),
+                    ignore::Match::Ignore(_)
+                ) {
                     continue;
                 }
             }
-
-            // if filter(path) {
-            //     continue;
-            // }
-
-            // let ignore_status = ignorer.matched(&path, path.is_dir());
-            // println!("{:?} {}", ignore_status, &path.to_string_lossy());
-            // if matches!(
-            //     filter.matched(&path, path.is_dir()),
-            //     ignore::Match::Ignore(_)
-            // ) {
-            //     println!("Ignoring {}", &path.to_string_lossy());
-            //     continue;
-            // }
 
             let name = path
                 .file_name()
