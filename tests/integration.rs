@@ -425,8 +425,6 @@ fn test_tree() {
     cmd()
         .arg(tmp.path())
         .arg("--tree")
-        .arg("--color")
-        .arg("never")
         .assert()
         .stdout(predicate::str::is_match("├── one\n└── one.d\n   └── two\n$").unwrap());
 }
@@ -443,8 +441,6 @@ fn test_tree_all_not_show_self() {
         .arg(tmp.path())
         .arg("--tree")
         .arg("--all")
-        .arg("--color")
-        .arg("never")
         .assert()
         .stdout(
             predicate::str::is_match("├── one\n└── one.d\n   ├── .hidden\n   └── two\n$").unwrap(),
@@ -465,8 +461,6 @@ fn test_tree_d() {
         .arg(tmp.path())
         .arg("--tree")
         .arg("-d")
-        .arg("--color")
-        .arg("never")
         .assert()
         .stdout(predicate::str::is_match("├── one.d\n│  └── one.d\n└── two.d\n$").unwrap());
 }
